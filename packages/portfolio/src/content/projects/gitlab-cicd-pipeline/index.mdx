@@ -1,0 +1,33 @@
+import Image from 'next/image'
+
+# 공통 CI/CD 파이프라인
+
+**수행기간: 2025.05 ~ 2025.08 (3개월)**
+
+## 프로젝트 개요
+
+<Image src="/images/CICD-공통-컴포넌트화-컨셉.png" alt="Hello" width={500} height={500} />
+
+팀에서 사용하는 CI 관련 스크릡트를 표준화하고 모든 프로젝트에서 사용할 수 있도록 공통화하는 프로젝트입니다.
+
+## 핵심 기능
+
+- 표준화된 CI/CD 스크립트
+- CI/CD Workflow, Job, Task를 한 곳에서 관리함 (쉘 스크립트(Python 스크립트))
+- 재사용 가능한 Job 및 Task 제공
+
+## 개발 스택
+
+- Gitlab CI/CD
+- Yaml
+- Python
+
+## 해결 방법
+
+- Project include 로 다른 gitlab 레포지토리 에서 파일을 가져와 include
+- hidden job, extends를 통한 브랜치 별 job 추상화
+- 파이프라인 스크립트에서 배포관련 템플릿을 clone 후 사용
+- yaml anchor를 통해 스크립트 간소화
+
+## 성과
+

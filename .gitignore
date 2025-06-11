@@ -1,11 +1,9 @@
-# IntelliJ IDEA
+## intelliJ IDEA
 .idea/
-*.iml
 
-# VS Code
-.vscode/
-*.code-workspace
-.history/
+## environment files
+.env*
 
-# macOS
-.DS_Store
+## Node.js
+node_modules/
+.next/
