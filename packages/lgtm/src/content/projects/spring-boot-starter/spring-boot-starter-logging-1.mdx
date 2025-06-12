@@ -1,0 +1,26 @@
+## [spring-boot-starter-logging](https://github.com/spring-projects/spring-boot/tree/main/spring-boot-project/spring-boot-starters/spring-boot-starter-logging) 분석
+
+## 🔍 전체 코드
+
+```kotlin filename="build.gradle.kts" copy
+plugins {
+	id("org.springframework.boot.starter")
+}
+
+description = "Starter for logging using Logback. Default logging starter"
+
+dependencies {
+	api("ch.qos.logback:logback-classic")
+	api("org.apache.logging.log4j:log4j-to-slf4j")
+	api("org.slf4j:jul-to-slf4j")
+}
+```
+
+## `plugins { id("org.springframework.boot.starter") }`
+
+**의미:**
+
+- spring-boot-starter는 Spring Boot 프로젝트의 starter 모듈을 정의할 때 사용하는 특별한 플러그인입니다.
+- spring-boot 프로젝트 자체에서 정의한 내부 Gradle Plugin으로, starter 모듈로서 동작하는 데 필요한 기본 설정, 메타데이터 처리, artifact 태그 구성 등을 자동화합니다.
+- 이 플러그인은 일반 사용자 프로젝트에서는 사용하지 않고, starter 모듈을 제작할 때만 사용합니다.
+

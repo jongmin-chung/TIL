@@ -1,0 +1,70 @@
+## 1. Starter란?
+
+**정의:**
+
+starter는 **Spring Boot 프로젝트에서 필요한 의존성들과 자동 설정(AutoConfiguration)** 을 묶어둔 **의존성 패키지**이다.
+
+**특징:**
+
+- spring-boot-starter-* 형식으로 명명됨
+- 다른 라이브러리들을 implementation 또는 compile로 포함하고 있음
+- 일반적으로는 자동 구성(AutoConfiguration) 과 함께 사용됨
+- 의존성만 담고 있고, 자체적으로 로직을 직접 포함하는 경우는 드뭄
+
+```kotlin filename="build.gradle.kts" copy
+implementation("org.springframework.boot:spring-boot-starter-web")
+```
+
+→ 내부적으로 spring-web, spring-boot-autoconfigure, jackson, tomcat 등을 포함
+
+## 2. 공통 라이브러리(Common Library)란?
+
+**정의:**
+
+공통 라이브러리는 프로젝트마다 공통으로 사용하는 **유틸, 설정, 인터페이스, 로직, 애너테이션 등**을 모아둔 **직접 작성한 재사용용 라이브러리**이다.
+
+**특징:**
+
+- starter 네이밍이 붙지 않음
+- 직접적인 비즈니스 로직을 포함할 수 있음
+- autoConfiguration을 가질 수도 있고, 없을 수도 있음
+- 팀 내에서 통일된 규칙/공통 기능 제공 목적
+
+## AutoConfiguration이 있으면 starter인가?
+
+❌ **반드시 그런것은 아니다.**
+
+| 질문                                   | 답변                                                        |
+|--------------------------------------|-----------------------------------------------------------|
+| AutoConfiguration 있으면 starter인가요?    | ❌ 아니요. AutoConfiguration이 있더라도 해당 모듈이 starter라고 부르지는 않아요.
+| starter는 AutoConfiguration이 있어야 하나요? | ✅ 대부분 그렇지만, starter는 단순히 의존성 모음집일 수도 있어요.                 |
+
+**예:**
+
+- spring-boot-starter-logging은 자동 설정이 거의 없고, 의존성 집합입니다.
+- 직접 만든 my-common-library에 @Configuration + spring.factories 또는
+META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports 가 있어도, 이름이 starter가 아니면 그냥 일반
+라이브러리이다.
+
+## ✅ **starter와 공통 라이브러리 차이 요약**
+
+| 항목                | starter                             | 공통 라이브러리                               |
+|-------------------|-------------------------------------|----------------------------------------|
+| 용도                | 필요한 의존성 집합을 제공                      | 공통 로직, 유틸, 설정 제공                       |
+| AutoConfiguration | 보통 포함                               | 있을 수도 있고 없을 수도 있음                      |
+| 직접 로직 포함          | 거의 없음 (설정 중심)                       | 많음                                     |
+| 이름 규칙             | \*-starter                          | 자유롭게                                   |
+| 의존성 선언 방식         | implementation 'group:starter-name' | implementation 'group:common-lib-name' |
+
+**결론:**
+
+- starter는 편의 제공용 패키지이며,
+- 공통 라이브러리는 코드 재사용을 위한 구조
+- starter는 공통 라이브러리를 포함하고 자동 구성까지 제공할 때도 많습니다.
+
+필요하다면, starter와 common-lib 두 개로 나눠서:
+
+- my-common-core (공통 유틸과 설정)
+- my-common-starter (위 의존성 포함 + AutoConfiguration)
+
+이렇게 구조화 한다.

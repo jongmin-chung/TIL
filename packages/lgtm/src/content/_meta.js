@@ -3,6 +3,7 @@ export default {
   projects: '프로젝트',
   features: '',
   themes: '',
-  advanced: '',
-  'spring-cloud': 'Spring Cloud'
+  'spring-boot': 'Spring Boot',
+  'spring-cloud': 'Spring Cloud',
+  maintenance: '유지보수',
 }

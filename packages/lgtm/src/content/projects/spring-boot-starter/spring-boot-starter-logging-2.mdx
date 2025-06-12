@@ -1,0 +1,107 @@
+## [spring-boot-starter-logging](https://github.com/spring-projects/spring-boot/tree/main/spring-boot-project/spring-boot-starters/spring-boot-starter-logging) 분석 2
+
+## ✅ 1. spring-logback.xml이 어디에 있고, 어떻게 적용되는가?
+
+Spring Application Start
+-> LoggingApplicationListener
+
+```text copy filename="spring.factories"
+# in spring-boot
+org.springframework.context.ApplicationListener=\
+org.springframework.boot.ClearCachesApplicationListener,\
+org.springframework.boot.builder.ParentContextCloserApplicationListener,\
+org.springframework.boot.context.FileEncodingApplicationListener,\
+org.springframework.boot.context.config.AnsiOutputApplicationListener,\
+org.springframework.boot.context.logging.LoggingApplicationListener,\
+org.springframework.boot.env.EnvironmentPostProcessorApplicationListener
+```
+
+LoggingApplicationListener는 Spring Boot 애플리케이션 실행 중 다양한 애플리케이션 이벤트를 처리한다.
+
+등록된 후, 아래와 같은 이벤트에 따라 해당 메서드가 호출된다:
+
+1. ApplicationStartingEvent:
+ - onApplicationStartingEvent() 메서드 호출
+ - 로깅 시스템 초기화 준비 작업 수행
+
+2. ApplicationEnvironmentPreparedEvent:
+ - onApplicationEnvironmentPreparedEvent() 메서드 호출
+ - 환경 변수 기반으로 로깅 시스템 설정.
+
+3. ApplicationPreparedEvent:
+ - onApplicationPreparedEvent() 메서드 호출
+ - 로깅 시스템 및 관련 빈 등록.
+
+4. ApplicationFailedEvent:
+ - onApplicationFailedEvent() 메서드 호출
+ - 애플리케이션 실패 시 로깅 시스템 정리.
+
+5. ContextClosedEvent:
+ - onContextClosedEvent() 메서드 호출
+ - 애플리케이션 종료 시 리소스 정리.
+
+이 메서드들은 onApplicationEvent(ApplicationEvent event)를 통해 이벤트 타입에 따라 호출됩니다.
+
+이에 따라 DefaultLogbackConfiguration 클래스가 로깅 설정을 처리한다.
+이 클래스는 `spring-boot` logging 모듈에 위치한다.
+
+```java filename="org.springframework.boot.context.logging.LoggingApplicationListener" copy
+class LoggingApplicationListener implements GenericApplicationListener {
+    private void onApplicationStartingEvent(ApplicationStartingEvent event) {
+		this.loggingSystem = LoggingSystem.get(event.getSpringApplication().getClassLoader());
+		this.loggingSystem.beforeInitialize();
+	}
+
+    protected void initialize(ConfigurableEnvironment environment, ClassLoader classLoader) {
+		getLoggingSystemProperties(environment).apply();
+		this.logFile = LogFile.get(environment);
+		if (this.logFile != null) {
+			this.logFile.applyToSystemProperties();
+		}
+		this.loggerGroups = new LoggerGroups(DEFAULT_GROUP_LOGGERS);
+		initializeEarlyLoggingLevel(environment);
+		initializeSystem(environment, this.loggingSystem, this.logFile);
+		initializeFinalLoggingLevels(environment, this.loggingSystem);
+		registerShutdownHookIfNecessary(environment, this.loggingSystem);
+	}
+}
+```
+
+```java filename="org.springframework.boot.logging.logback.DefaultLogbackConfiguration" copy
+class DefaultLogbackConfiguration {
+    void apply(LogbackConfigurator config) {
+        config.getConfigurationLock().lock();
+        try {
+            defaults(config);
+            Appender<ILoggingEvent> consoleAppender = consoleAppender(config);
+            if (this.logFile != null) {
+                Appender<ILoggingEvent> fileAppender = fileAppender(config, this.logFile.toString());
+                config.root(Level.INFO, consoleAppender, fileAppender);
+            }
+            else {
+                config.root(Level.INFO, consoleAppender);
+            }
+        }
+        finally {
+            config.getConfigurationLock().unlock();
+        }
+    }
+}
+```
+
+```java filename="org.springframework.boot.logging.LoggingSystem" copy
+public abstract class LoggingSystem {
+	public static LoggingSystem get(ClassLoader classLoader) {
+		String loggingSystemClassName = System.getProperty(SYSTEM_PROPERTY);
+		if (StringUtils.hasLength(loggingSystemClassName)) {
+			if (NONE.equals(loggingSystemClassName)) {
+				return new NoOpLoggingSystem();
+			}
+			return get(classLoader, loggingSystemClassName);
+		}
+		LoggingSystem loggingSystem = SYSTEM_FACTORY.getLoggingSystem(classLoader);
+		Assert.state(loggingSystem != null, "No suitable logging system located");
+		return loggingSystem;
+	}
+}
+```
