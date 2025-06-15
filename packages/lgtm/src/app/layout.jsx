@@ -30,7 +30,8 @@ export default async function RootLayout({ children }) {
       logo={
         <div>
           <b>LGTM</b>
-          <span style={{ opacity: '60%' }}>()</span>
+          {/*변경 되게 하려함 animation 으로*/}
+          <span style={{ opacity: '60%' }}>(👍)</span>
         </div>
       }
       projectLink="https://github.com/jongmin-chung"
@@ -44,7 +45,7 @@ export default async function RootLayout({ children }) {
         <Layout
           navbar={navbar}
           editLink="Edit this page on GitHub"
-          docsRepositoryBase="https://github.com/jongmin-chung/TIL/app/portfolio"
+          docsRepositoryBase="https://github.com/jongmin-chung/TIL/packages/lgtm"
           sidebar={{ defaultMenuCollapseLevel: 1 }}
           pageMap={pageMap}
         >
